@@ -1,5 +1,5 @@
 # setup.py
-# A distutils setup script to register TortoiseHg COM server
+# A distutils setup script to register TortoiseGit COM server
 
 # To build stand-alone package, use 'python setup.py py2exe' then use
 # InnoSetup to build the installer.  By default, the installer will be
@@ -36,24 +36,18 @@ import py2exe
 
 _data_files = []
 extra = {}
-hgextmods = []
 
 if 'py2exe' in sys.argv:
-    # FIXME: quick hack to include installed hg extensions in py2exe binary
-    import hgext
-    hgextdir = os.path.dirname(hgext.__file__)
-    hgextmods = set(["hgext." + os.path.splitext(f)[0]
-                  for f in os.listdir(hgextdir)])
     _data_files = [(root, [os.path.join(root, file_) for file_ in files])
                         for root, dirs, files in os.walk('icons')]
     extra['windows'] = [
-            {"script":"hgproc.py",
-                        "icon_resources": [(1, "icons/tortoise/hg.ico")]},
+            {"script":"gitproc.py",
+                        "icon_resources": [(1, "icons/tortoise/git.ico")]},
             {"script":"tracelog.py",
                         "icon_resources": [(1, "icons/tortoise/python.ico")]}
             ]
-    extra['com_server'] = ["tortoisehg"]
-    extra['console'] = ["contrib/hg", "contrib/hgtk"]
+    extra['com_server'] = ["tortoisegit"]
+    extra['console'] = ["contrib/git", "contrib/gitgtk"]
 
 opts = {
    "py2exe" : {
@@ -67,24 +61,23 @@ opts = {
        #    also needed is the GTK's share/themes (as dist/share/themes), 
        #    for dialogs to display in MS-Windows XP theme.
        "includes" : "dbhash,pango,atk,pangocairo,cairo,gobject," + \
-                    ",".join(hgextmods),
+                    ",".join(gitextmods),
    }
 }
 
-# specify version string, otherwise 'hg identify' will be used:
 version = ''
 
-import tortoise.version
-tortoise.version.remember_version(version)
+import tortoisegit.version
+tortoisegit.version.remember_version(version)
 
-setup(name="TortoiseHg",
-        version=tortoise.version.get_version(),
-        author='TK Soh',
-        author_email='teekaysoh@gmail.com',
-        url='http://tortoisehg.sourceforge.net',
-        description='Windows shell extension for Mercurial VCS',
+setup(name="TortoiseGit",
+        version=tortoisegit.version.get_version(),
+        author='Scott Chacon',
+        author_email='scahcon@gmail.com',
+        url='http://github.com/schacon/tortoisegit',
+        description='Windows shell extension for Git VCS',
         license='GNU GPL2',
-        packages=['tortoise', 'hggtk', 'hggtk.vis', 'hggtk.iniparse'],
+        packages=['tortoisegit', 'gitgtk', 'gitgtk.vis', 'gitgtk.iniparse'],
         data_files = _data_files,
         options=opts,
         **extra

@@ -14,7 +14,7 @@ import Queue
 import win32trace
 
 try:
-    from hggtk.hglib import toutf
+    from gitgtk.gitlib import toutf
 except ImportError:
     import locale
     _encoding = locale.getpreferredencoding()
