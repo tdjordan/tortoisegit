@@ -1,0 +1,313 @@
+                    Release Notes for TortoiseHg
+
+This file contains last minute notes to users about the releases, which may not
+be included in the documentation or README files included with the distribution
+kits.  It also contains change information, for users who are interested in
+what bugs have been fixed, and what features have been added in the current
+version.
+
+New features and improvement in 0.5:
+
+  * Explorer shell extensions:
+    - share overlay icons with TortoiseSVN 1.5.x via TortoiseSVN's 
+	  TortoiseOverlays project (by Peer Sommerlund)
+
+  * New mercurial-like command line syntax for hgtk, with help support.
+
+  * The gPyFm merge-tool is not longer bundled (see bug 2119067)
+  
+  * Interal commit dialog:
+	- show number of files selected (also apply to Status dialog)
+	- add 'Undo' button to rollback last commit.
+	- do not clear commit message window if commit fails
+    - accept commit message in multi-byte charset (fix bug 2116362)
+	
+  * Synchronize dialog:
+    - load patchbomb extension automatically (by Peer Sommerlund)
+
+  
+Bug fixes in 0.5:
+  
+  * [ 2119138 ] Merge-tool priority fix (by Mads Kiilerich)
+  * [ 2116362 ] Internal commit tool not support gbk comment
+  * [ 2113989 ] Can't create repository via Explorer context menu (when 
+                a file is selected)	
+  * [ 2103749 ] Changelog viewer doesn't refresh after making local tag
+  
+  * nautilus: fix error when there is no repo in the current directory
+    (by Germán Póo-Caamaño)
+
+
+New features and improvement in 0.4.1:
+
+  * Installer-only release to link with Mercurial 1.0.2
+
+New features and improvement in 0.4:
+
+  * Updated to work, and link, with Mercurial 1.0.1
+
+  * Explorer shell extensions:
+    - Added user config option 'tortoisehg.overlayicons' to enable/disable
+      display of overlay icons in selected repos.
+
+      Available options:
+        True:
+          Show overlay icons
+        False:
+          Don't show overlay icons
+        localdisks:
+          [global (user) setting only]
+          Don't show overlay icons for repos reside on network drives.
+
+    - Create .hgignore file automatically when initializing new repo
+      via 'Initialize new repo' context menu.
+
+  * Hgk ('Revision Graph' on Explorer's context menu), better known as
+    'hg view', is officially replaced by TortoiseHg's changelog viewer
+    ('View Changelog').
+
+    Note: Hgk may be reinstated by user, if necessary. Though it would
+          need some work to setup.
+
+  * Changelog (History) Viewer:
+    - Added 'strip' and 'backout' functions to file context menu.
+    - Loading of changeset data (file list of diff chunks) is done in
+      background to improve response.
+    - Changeset window shows 'MAR' file status.
+    - File list has been moved to the left hand side.
+
+  * Synchronize dialog:
+    - Added 'Stop' button to abort command executions.
+    - Added support for Fetch extension, as Pull's 'Do fetch' option [ 1914855 ].
+    - Added buttons to 'View Pulled Changes' and 'Update to Tip'.
+    - Recall source and destination paths accessed in recent sessions.
+    - Recall Pull's 'Update to new tip' option setting from previous session
+      [ 1944469 ].
+
+  * Datamine dialog:
+    - Added 'Stop' button to abort grep searches.
+    - Added column for user names on annotate pages.
+
+  * Commit dialog (internal, _not_ Qct):
+    - Recall commit messages of recent commits.
+    - Fixed handlng of merged repo per new Hg behavior (must commit all
+      files in a merged repo)
+
+  * Clone dialog:
+    - Recall source and destination paths accessed in recent sessions.
+    - Cloning can now be aborted with the new 'Stop' button in HgCmd dialog.
+
+  * Recovery dialog:
+    - Added 'Stop' button to abort command executions.
+
+  * Added 'Stop' button to abort command executions in HgCmd dialog.
+    This applies to including Update, Clone and Commit dialogs, which
+    utilize HgCmd dialog to perform respective operations.
+
+  * Unicode handling:
+    - Improved handling of UTF strings in Mercurial's metadata (commit
+      message, author, etc).
+    - Support Mercurial's HGENCODING environment variable.
+
+  * Hgtk:
+    - Simplified installation on Unix/Linux systems.
+    - Confirm presence of critical Python modules, i.e. PyGTK and Mercurial.
+
+  * Logos and icons:
+    - Updated Hg icon (on context menu and dialogs) to new droplet design
+      introduced in Mercurial 1.0
+    - New TortoiseHg logo (in About dialog) by Peer Sommerlund.
+    - Several new menu icons by Peer Sommerlund, with better Windows
+      integration. The corresponding SVG source is also available in
+      TortoiseHg source tree.
+
+  * Several other bugfixes and UI improvements.
+
+Bug fixes in 0.4:
+
+  * Explorer shell extensions:
+    - Register context menu and overlay icon extensions onto the Explorer's
+      approved list.
+    - Fixed ThreadingModel registry setting per MS doc [ 1895443 ]
+  * TortoiseHg program groups now read 'hgproc' with hg.ico (in earlier
+    versions, it used 'Python' with python.ico)
+  * Make modal dialogs stay on top of their respective parent application
+    (issue triggered by a bug in PyGTK).
+  * Fixed random crashes in web server.
+  * Fixed addremove behavior in Commit dialog.
+  * Activated target revision option in Synchronize window that had been
+    dormant so far (as reported by Doug Philips).
+  * Terminate all backgrounded searches in Datamine window upon exit, so
+    the associated Python process may terminate immediately too.
+  * [ 1884919 ] Change Log hscroller
+  * [ 1925985 ] HTTP port field not effective
+  * [ 1914859 ] Global options should show up more often
+  * [ 1914550 ] Changelog: Problems with german umlaut characters
+  * [ 1902446 ] Commit claims file not under root while kdiff is open.
+  * [ 1892791 ] Windows Explorer painfully slow for network drives
+
+Changes and bug fixes since 0.4RC4:
+
+  * Fixed traceback when revert file in changeset or log windows.
+  * Fixed traceback when testing paths in Configure window.
+
+Changes and bug fixes since 0.4RC3:
+
+  * Activated target revision option in Synchronize window that had been
+    dormant so far (as reported by Doug Philips).
+  * Terminate all backgrounded searches in Datamine window upon exit, so
+    the associated Python process may terminate immediately too.
+  * New icons by Peer Sommerlund for configuration windows to represent
+    repo and user config respectively.
+  * Theme improvement in the Configuration windows (by Peter Ruibal).
+  * Detect PyGtk and Mercurial installation more accurately in Hgtk
+  * Removed 'square-boxes' in license window (of About window) caused by
+    extra form-feed characters.
+
+Changes and bug fixes since 0.4RC2:
+
+  * Fixed traceback in tracelog, which was broken in 0.4RC2.
+  * Right-click to diff/visual-diff to selected changeset, which replaced
+    the earlier diff-to-marked function.
+  * Create .hgignore file automatically when initializing new repo.
+  * Fix traceback when users try to enable internal commit dialog with
+    an empty 'commit' in mercurial.ini's 'tortoisehg' section.
+  * Handle empty cmd.differ entries in hgrc like hg does
+  * Register context menu and overlay icon extension onto the Explorer's
+    Approved list.
+  * Fixed UTF-8 encoding errors in hgcmd and several error message dialogs.
+  * New transparent TortoiseHg logo in About dialog, again by Peer Sommerlund.
+  * New 32x32 icons for dialogs to provide nicer icons when navigating
+    through the applications with Alt-Tab on Windows.
+  * Minor improvement/fixes on hgtk to simplify installation on *nix systems.
+
+Changes and bug fixes since 0.4RC1:
+
+  * Added buttons to stop command execution in Synchronize, Recovery,
+    as well as any dialogs that use hgcmd dialog, including Update and
+    Clone dialogs.
+  * Show progress on status bar when updating changeset viewer.
+  * Support Mercurial's HGENCODING environment variable.
+  * [ Feature 1944469 ] Save and recall pull-update option in Synchronize
+    dialog across sessions.
+  * [ Bug 1939794 ] Unable to Merge changes with builtin commit UI.
+  * [ Bug 1941545 ] Clone log window doesn't scroll.
+  * [ Bug 1943382 ] hgproc.bat not executable without "installer"
+  * [ Bug 1941368 ] Configure Repository "Test" button results broken.
+  * [ Bug 1939911 ] Modal Dialogs aren't staying on top on application switch
+  * [ Bug 1941376 ] hgtk with no parameters gives no help.
+  * [ Bug 1937966 ] Changelog: utf8 messages handled incorrectly
+  * [ Bug 1942777 ] National characters are not handled correctly.
+
+Fixes in Mercurial since 0.3:
+
+  * qimport fixed on Windows
+  * new built-in filemerge system replaces hgmerge patches
+  * many fixes for keyword extension
+  * new -U (context lines) argument for diff and qdiff commands
+
+New features in 0.3
+
+  * Major improvements to changelog browser.  It is now good enough to
+    deprecate both hgk and hgview.  Neither are bundled with the 0.3
+    binary installer, but both can be added by the user if they wish.
+    Support for external revision log viewers will be dropped in 0.4.
+
+  * The new changelog browser supports filtering by file pattern,
+    keywords, dates, and branches.  It is capable of graphing both the
+    repository changelog and individual filelogs.  Changeset coloring by
+    author is optional (tortoisehg.authorcolor).  All changeset graphing
+    is done incrementally in batches (tortoisehg.graphlimit: 500)
+
+  * New DataMine application for searching history (hg grep) and
+    inspecting file histories (hg annotate).  This new application is
+    tabbed to facilitate debugging sessions where search results and
+    annotations can be grouped together for easy cross-reference.
+
+  * New changeset browser, supports multiple parents intrinsically and
+    supports a number of file-revision features (view at revision, save
+    at revision, annotate at revision, revert to revision, etc).  The
+    new changeset browser is also integrated into the changelog browser.
+
+  * Standardized window layouts.  Close buttons have been moved to the
+    toolbar.  Dialogs that use progress bars now use a standard status
+    bar/progress bar widget.  Tooltips have been added.
+
+  * Hgtk wrapper application for launching TortoiseHg dialogs from the
+    command line
+
+  * Support for an external visual editor: tortoisehg.editor.  Takes
+    precedence over ui.editor when viewing files with TortoiseHg
+
+  * Performance improvements in Mercurial itself (cset 0973501e5f4a)
+
+  * New installer bitmap from Peer Sommerlund
+
+  * Misc: The Synchronize dialog has been improved.  The Web Serve
+    dialog no longer requires a subprocess to run the web server.  The
+    configuration dialog has a number of bug fixes for the paths tab,
+    and now has separators in the drop-down boxes for the varying value
+    types (current, suggested, history). Http authentication has been
+    fixed.  The hg integration library has seen major cleanups.
+
+Bug Fixes in 0.3:
+
+  * [ 1863086 ] "Revision Graph" fail on UNC path
+    Fixed by removing hgk from base install.  Integrated log viewer
+    is UNC path safe.
+  * [ 1851395 ] Total Commander problem
+  * [ 1882074 ] global name 'p' is not defined
+  * [ 1854443 ] View changelog fails
+
+New features in 0.2
+
+  * Gtools has been integrated into TortoiseHg proper. It is no longer
+    bundled as a Mercurial extension. The graphlog extension is now enabled
+    again by default (only usable from the CLI, however).
+
+  * Context menu icons, application window icons. The context menu has been
+    simplified.
+
+  * The changelog browser has a number of new features (filters and context
+    menu options). The tag browser and changelog tagging features have been
+    merged into this tool.
+
+  * Hgview is now the default history viewer, hgk is being deprecated.
+
+  * An email dialog for interfacing with the patchbomb extension. It can be
+    reached from the synchronize dialog and from the changelog browser.
+
+  * A new configuration tool (replacing hg-config dialogs) that allows you
+    to configure TortoiseHg and Mercurial.
+
+  * Most dialogs now use HgThread and GtkUI to run hg commands. These
+    classes run the command in a background thread and provide GUI prompts
+    for when user interaction is necessary (http web auth, etc). For some
+    commands, it also provides a progress bar.
+
+  * A preview of the new Mercurial merge back end. The python hgmerge.py
+    script is being integrated into Mercurial, and this installer has a
+    preview of how that will work. You need to unset any ui.merge in your
+    Mercurial.ini file in order for it to work properly. If you don't
+    configure anything it will use simplemerge to automatically perform
+    merges. If conflicts are found it falls back to kdiff3 to resolve
+    them interactively.
+
+  * Slight improvement on speed of overlay icons display.
+
+  * A new 'about' dialog.
+
+Bugs fixed in 0.2
+
+  * [SF Bug #1851395] Overlay icons and context menus are no longer
+    restricted to MS-Explorer. So other file managers, such as Total
+    Commander, should be supported.
+
+  * [SF Bug #1844722] Users can now create repositories inside repository
+     via the context menu.
+
+Changes since 0.2rc1
+
+  - N/A -
+
+
