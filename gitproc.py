@@ -6,43 +6,34 @@
 
 import os
 import sys
-from mercurial import ui
-from tortoise.thgutil import get_prog_root
+from tortoisegit.tgitutil import get_prog_root
 
-# always use hg exe installed with TortoiseHg
-thgdir = get_prog_root()
+# always use git exe installed with TortoiseHg
+tgitdir = get_prog_root()
 try:
-    os.environ['PATH'] = os.path.pathsep.join([thgdir, os.environ['PATH']])
+    os.environ['PATH'] = os.path.pathsep.join([tgitdir, os.environ['PATH']])
 except KeyError:
-    os.environ['PATH'] = thgdir
+    os.environ['PATH'] = tgitdir
 
 if not sys.stdin.isatty():
     try:
         import win32traceutil
-        
-        # FIXME: quick workaround traceback caused by missing "closed" 
-        # attribute in win32trace.
-        from mercurial import ui
-        def write_err(self, *args):
-            for a in args:
-                sys.stderr.write(str(a))
-        ui.ui.write_err = write_err
     except ImportError:
         pass
     except pywintypes.error:
         pass
 
-# Map hgproc commands to dialog modules in hggtk/
-from hggtk import commit, status, addremove, tagadd, tags, history, merge
-from hggtk import diff, revisions, update, serve, clone, synch, hgcmd, about
-from hggtk import recovery, thgconfig, datamine
+# Map gitproc commands to dialog modules in gitgtk/
+from gitgtk import commit, status, addremove, tagadd, tags, history, merge
+from gitgtk import diff, revisions, update, serve, clone, synch, gitcmd, about
+from gitgtk import recovery, tgitconfig, datamine
 _dialogs = { 'commit' : commit,    'status' : status,    'revert' : status,
              'add'    : addremove, 'remove' : addremove, 'tag'    : tagadd,
              'tags'   : tags,      'log'    : history,   'history': history,
              'diff'   : diff,      'merge'  : merge,     'tip'    : revisions,
              'parents': revisions, 'heads'  : revisions, 'update' : update,
              'clone'  : clone,     'serve'  : serve,     'synch'  : synch,
-             'about'  : about,     'config' : thgconfig, 'recovery': recovery,
+             'about'  : about,     'config' : tgitconfig, 'recovery': recovery,
              'datamine': datamine }
 
 def get_list_from_file(filename):
@@ -58,7 +49,7 @@ def get_option(args):
     opts, args = getopt.getopt(args, "c:e:l:dR:", long_opt_list)
     # Set default options
     options = {}
-    options['hgcmd'] = 'help'
+    options['gitcmd'] = 'help'
     options['cwd'] = os.getcwd()
     options['files'] = []
     options['gui'] = True
@@ -67,7 +58,7 @@ def get_option(args):
     
     for o, a in opts:
         if o in ("-c", "--command"):
-            options['hgcmd'] = a
+            options['gitcmd'] = a
         elif o in ("-l", "--listfile"):
             listfile = a
         elif o in ("-d", "--deletelistfile"):
@@ -89,7 +80,7 @@ def get_option(args):
 def parse(args):
     option, args = get_option(args)
     
-    cmdline = ['hg', option['hgcmd']] 
+    cmdline = ['git', option['gitcmd']] 
     if 'root' in option:
         cmdline.append('--repository')
         cmdline.append(option['root'])
@@ -98,7 +89,7 @@ def parse(args):
     option['cmdline'] = cmdline
 
     global _dialogs
-    dialog = _dialogs.get(option['hgcmd'], hgcmd)
+    dialog = _dialogs.get(option['gitcmd'], gitcmd)
     dialog.run(**option)
 
 
@@ -107,16 +98,16 @@ def run_trapped(args):
         dlg = parse(sys.argv[1:])
     except:
         import traceback
-        from hggtk.dialog import error_dialog
+        from gitgtk.dialog import error_dialog
         tr = traceback.format_exc()
         print tr
-        error_dialog(None, "Error executing hgproc", tr)
+        error_dialog(None, "Error executing gitproc", tr)
 
 if __name__=='__main__':
     #dlg = parse(['-c', 'help', '--', '-v'])
-    #dlg = parse(['-c', 'log', '--root', 'c:\hg\h1', '--', '-l1'])
+    #dlg = parse(['-c', 'log', '--root', 'c:\git\h1', '--', '-l1'])
     #dlg = parse(['-c', 'status', '--root', 'c:\hg\h1', ])
     #dlg = parse(['-c', 'add', '--root', 'c:\hg\h1', '--listfile', 'c:\\hg\\h1\\f1', '--notify'])
     #dlg = parse(['-c', 'rollback', '--root', 'c:\\hg\\h1'])
-    print "hgproc sys.argv =", sys.argv
+    print "gitproc sys.argv =", sys.argv
     dlg = run_trapped(sys.argv[1:])

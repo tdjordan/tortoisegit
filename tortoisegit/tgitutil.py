@@ -19,7 +19,7 @@ def shellquote(s):
 
 def find_root(path):
     p = os.path.isdir(path) and path or os.path.dirname(path)
-    while not os.path.isdir(os.path.join(p, ".hg")):
+    while not os.path.isdir(os.path.join(p, ".git")):
         oldp = p
         p = os.path.dirname(p)
         if p == oldp:

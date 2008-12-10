@@ -9,8 +9,6 @@ import gtk
 import gobject
 import os
 import pango
-from mercurial import hg, ui, cmdutil, util
-from mercurial.repo import RepoError
 from dialog import error_dialog, question_dialog
 import shlib
 import shelve
@@ -44,12 +42,12 @@ class ConfigDialog(gtk.Dialog):
             self.ui = repo.ui
             name = repo.ui.config('web', 'name') or os.path.basename(repo.root)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
-            self.set_title('TortoiseHg Configure Repository - ' + name)
+            self.set_title('TortoiseGit Configure Repository - ' + name)
             shlib.set_tortoise_icon(self, 'settings_repo.ico')
             self.root = repo.root
         else:
             self.rcpath = util.user_rcpath()
-            self.set_title('TortoiseHg Configure User-Global Settings')
+            self.set_title('TortoiseGit Configure User-Global Settings')
             shlib.set_tortoise_icon(self, 'settings_user.ico')
             self.root = None
 
@@ -75,7 +73,7 @@ class ConfigDialog(gtk.Dialog):
         # create pages for each section of configuration file
         self._tortoise_info = (
                 ('Commit Tool', 'tortoisehg.commit', ['qct', 'internal'],
-                    'Select commit tool launched by TortoiseHg. Qct is'
+                    'Select commit tool launched by TortoiseGit. Qct is'
                     ' not included, must be installed separately'),
                 ('Visual Diff Tool', 'tortoisehg.vdiff', [],
                     'Specify the visual diff tool; must be extdiff command'),

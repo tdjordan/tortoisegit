@@ -15,18 +15,14 @@ import win32gui
 import win32gui_struct
 import win32api
 import _winreg
-from mercurial import hg
-from mercurial import repo as _repo
-from thgutil import *
+from tgitutil import *
 
 # FIXME: quick workaround traceback caused by missing "closed" 
 # attribute in win32trace.
 import sys
-from mercurial import ui
 def write_err(self, *args):
     for a in args:
         sys.stderr.write(str(a))
-ui.ui.write_err = write_err
 
 S_OK = 0
 S_FALSE = 1
@@ -62,7 +58,7 @@ def open_repo(path):
     root = find_root(path)
     if root:
         try:
-            repo = hg.repository(ui.ui(), path=root)
+            repo = git.repository(root)
             return repo
         except _repo.RepoError:
             pass
@@ -70,10 +66,10 @@ def open_repo(path):
     return None
 
 def open_dialog(cmd, cmdopts='', cwd=None, root=None, filelist=[], gui=True):
-    app_path = find_path("hgproc", get_prog_root(), '.EXE;.BAT')
+    app_path = find_path("gitproc", get_prog_root(), '.EXE;.BAT')
 
     if filelist:
-        fd, tmpfile = tempfile.mkstemp(prefix="tortoisehg_filelist_")
+        fd, tmpfile = tempfile.mkstemp(prefix="tortoisegit_filelist_")
         os.write(fd, "\n".join(filelist))
         os.close(fd)
 
@@ -117,10 +113,10 @@ def run_program(cmdline):
                            stdout=subprocess.PIPE,
                            stdin=subprocess.PIPE)
     
-"""Windows shell extension that adds context menu items to Mercurial repository"""
+"""Windows shell extension that adds context menu items to Git repository"""
 class ContextMenuExtension:
-    _reg_progid_ = "Mercurial.ShellExtension.ContextMenu"
-    _reg_desc_ = "Mercurial Shell Extension"
+    _reg_progid_ = "Git.ShellExtension.ContextMenu"
+    _reg_desc_ = "Git Shell Extension"
     _reg_clsid_ = "{EEE9936B-73ED-4D45-80C9-AF918354F885}"
     _com_interfaces_ = [shell.IID_IShellExtInit, shell.IID_IContextMenu]
     _public_methods_ = [
@@ -130,22 +126,22 @@ class ContextMenuExtension:
 
     registry_keys = [
         (_winreg.HKEY_CLASSES_ROOT,
-         r"*\shellex\ContextMenuHandlers\TortoiseHg", 
+         r"*\shellex\ContextMenuHandlers\TortoiseGit", 
          [(None, _reg_clsid_)]),
         (_winreg.HKEY_CLASSES_ROOT,
-         r"Directory\Background\shellex\ContextMenuHandlers\TortoiseHg",
+         r"Directory\Background\shellex\ContextMenuHandlers\TortoiseGit",
          [(None, _reg_clsid_)]),
         (_winreg.HKEY_CLASSES_ROOT,
-         r"Directory\shellex\ContextMenuHandlers\TortoiseHg",
+         r"Directory\shellex\ContextMenuHandlers\TortoiseGit",
          [(None, _reg_clsid_)]),
         (_winreg.HKEY_CLASSES_ROOT,
-         r"Folder\shellex\ContextMenuHandlers\TortoiseHg",
+         r"Folder\shellex\ContextMenuHandlers\TortoiseGit",
          [(None, _reg_clsid_)]),
         (_winreg.HKEY_CLASSES_ROOT,
-         r"Directory\shellex\DragDropHandlers\TortoiseHg",
+         r"Directory\shellex\DragDropHandlers\TortoiseGit",
          [(None, _reg_clsid_)]),
         (_winreg.HKEY_CLASSES_ROOT,
-         r"Folder\shellex\DragDropHandlers\TortoiseHg",
+         r"Folder\shellex\DragDropHandlers\TortoiseGit",
          [(None, _reg_clsid_)]),
         ]
 
@@ -216,14 +212,14 @@ class ContextMenuExtension:
         if uFlags & shellcon.CMF_DEFAULTONLY:
             return 0
 
-        thgmenu = []    # hg menus
+        tgitmenu = []    # git menus
 
         # a brutal hack to detect if we are the first menu to go on to the 
         # context menu. If we are not the first, then add a menu separator
         # The number '30000' is just a guess based on my observation
         print "idCmdFirst = ", idCmdFirst
         if idCmdFirst >= 30000:
-            thgmenu.append(TortoiseMenuSep())
+            tgitmenu.append(TortoiseMenuSep())
             
         # As we are a context menu handler, we can ignore verbs.
         self._handlers = {}
@@ -234,24 +230,24 @@ class ContextMenuExtension:
             # add regularly used commit menu to main context menu
             rpath = self._folder or self._filenames[0]
             if open_repo(rpath):
-                thgmenu.append(TortoiseMenu(_("HG Commit..."), 
+                tgitmenu.append(TortoiseMenu(_("HG Commit..."), 
                                _("Commit changes in repository"),
                                self._commit, icon="menucommit.ico"))
                                
-            # get other menus for hg submenu
+            # get other menus for git submenu
             commands = self._get_commands()
 
         # add common menu items
         commands.append(TortoiseMenuSep())
         commands.append(TortoiseMenu(_("About"),
-                       _("About TortoiseHg"),
+                       _("About TortoiseGit"),
                        self._about, icon="menuabout.ico"))
        
-        # create submenus with Hg commands
-        thgmenu.append(TortoiseSubmenu("TortoiseHG", commands, icon="hg.ico"))
-        thgmenu.append(TortoiseMenuSep())
+        # create submenus with Git commands
+        tgitmenu.append(TortoiseSubmenu("TortoiseHG", commands, icon="git.ico"))
+        tgitmenu.append(TortoiseMenuSep())
         
-        idCmd = self._create_menu(hMenu, thgmenu, indexMenu, 0, idCmdFirst)
+        idCmd = self._create_menu(hMenu, tgitmenu, indexMenu, 0, idCmdFirst)
 
         # Return total number of menus & submenus we've added
         return idCmd
@@ -281,7 +277,7 @@ class ContextMenuExtension:
         if not drag_repo:
             return []
         if drag_repo and drag_repo.root != drag_path:
-            return []   # dragged item must be a hg repo root directory
+            return []   # dragged item must be a git repo root directory
 
         drop_repo = open_repo(self._folder)
         
@@ -322,14 +318,14 @@ class ContextMenuExtension:
                            self._status, icon="menushowchanged.ico"))
 
             # Visual Diff (any extdiff command)
-            has_vdiff = repo.ui.config('tortoisehg', 'vdiff', '') != ''
+            has_vdiff = repo.ui.config('tortoisegit', 'vdiff', '') != ''
             result.append(TortoiseMenu(_("Visual Diff"),
                            _("View changes using GUI diff tool"),
                            self._vdiff, icon="TortoiseMerge.ico",
                            state=has_vdiff))
                            
             result.append(TortoiseMenu(_("Add Files"),
-                           _("Add files to Hg repository"),
+                           _("Add files to Git repository"),
                            self._add, icon="menuadd.ico"))
             result.append(TortoiseMenu(_("Remove Files"),
                            _("Remove selected files on the next commit"),
@@ -369,7 +365,7 @@ class ContextMenuExtension:
                            _("Search revisions of files for a text pattern"),
                            self._grep, icon="menurepobrowse.ico"))
                            
-            if repo.ui.config('tortoisehg', 'view'):
+            if repo.ui.config('tortoisegit', 'view'):
                 result.append(TortoiseMenu(_("Revision Graph"),
                                _("View history with DAG graph"),
                                self._view, icon="menurevisiongraph.ico"))
@@ -439,42 +435,18 @@ class ContextMenuExtension:
         self._run_dialog('config')
 
     def _vdiff(self, parent_window):
-        '''[tortoisehg] vdiff = <any extdiff command>'''
-        diff = ui.ui().config('tortoisehg', 'vdiff', None)
-        if not diff:
-            msg = "You must configure tortoisehg.vdiff in your Mercurial.ini"
-            title = "Visual Diff Not Configured"
-            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
-            return
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        open_dialog(diff, root=root, filelist=targets, gui=False)
+        '''[tortoisegit] vdiff = <any extdiff command>'''
+        msg = "You must configure tortoisegit.vdiff in your Git.ini"
+        title = "Visual Diff Not Configured"
+        win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+        return
 
     def _view(self, parent_window):
-        '''[tortoisehg] view = [hgk | hgview]'''
-        view = ui.ui().config('tortoisehg', 'view', '')
-        if not view:
-            msg = "You must configure tortoisehg.view in your Mercurial.ini"
-            title = "Revision Graph Tool Not Configured"
-            win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
-            return
-
-        targets = self._filenames or [self._folder]
-        root = find_root(targets[0])
-        if view == 'hgview':
-            hgviewpath = find_path('hgview')
-            cmd = "%s --repository=%s" % \
-                    (shellquote(hgviewpath), shellquote(root))
-            if len(self._filenames) == 1:
-                cmd += " --file=%s" % shellquote(self._filenames[0])
-            run_program(cmd)
-        else:
-            if view == 'hgk':
-                open_dialog('view', root=root, gui=False)
-            else:
-                msg = "Revision graph viewer %s not recognized" % view
-                title = "Unknown history tool"
-                win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+        '''[tortoisegit] view = [gitk | gitview]'''
+        msg = "You must configure tortoisegit.view in your Git.ini"
+        title = "Revision Graph Tool Not Configured"
+        win32ui.MessageBox(msg, title, win32con.MB_OK|win32con.MB_ICONERROR)
+        return
 
     def _history(self, parent_window):
         self._log(parent_window)
@@ -492,7 +464,7 @@ class ContextMenuExtension:
         src = self._filenames[0]
         dest = self._folder
         msg = "Push changes from %s into %s?" % (src, dest)
-        title = "Mercurial: push"
+        title = "Git: push"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 2:
             return
@@ -504,7 +476,7 @@ class ContextMenuExtension:
         src = self._filenames[0]
         dest = self._folder
         msg = "Pull changes from %s?" % (src)
-        title = "Mercurial: pull"
+        title = "Git: pull"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 2:
             return
@@ -529,22 +501,22 @@ class ContextMenuExtension:
         if os.path.isfile(dest):
             dest = os.path.dirname(dest)
 
-        msg = "Create Hg repository in %s?" % (dest)
-        title = "Mercurial: init"
+        msg = "Create Git repository in %s?" % (dest)
+        title = "Git: init"
         rv = win32ui.MessageBox(msg, title, win32con.MB_OKCANCEL)
         if rv == 2:
             return
         try:
             # initialize the repo
-            hg.repository(ui.ui(), dest, create=1)
+            git.repository(dest, create=1)
             
-            # create the .hgignore file, mainly to workaround
+            # create the .gitignore file, mainly to workaround
             # Explorer's problem in creating files with name
             # that start with a dot.
-            hgignore = os.path.join(dest, '.hgignore')
-            if not os.path.exists(hgignore):
+            gitignore = os.path.join(dest, '.gitignore')
+            if not os.path.exists(gitignore):
                 try:
-                    open(hgignore, 'wb')
+                    open(gitignore, 'wb')
                 except:
                     pass
         except:
@@ -627,14 +599,14 @@ class ContextMenuExtension:
         # tabs for each file
         self._run_dialog('datamine')
 
-    def _run_dialog(self, hgcmd, noargs=False, verbose=True, modal=False):
+    def _run_dialog(self, gitcmd, noargs=False, verbose=True, modal=False):
         if self._folder:
             cwd = self._folder
         elif self._filenames:
             f = self._filenames[0]
             cwd = os.path.isdir(f) and f or os.path.dirname(f)
         else:
-            win32ui.MessageBox("Can't get cwd!", 'Hg ERROR', 
+            win32ui.MessageBox("Can't get cwd!", 'Git ERROR', 
                    win32con.MB_OK|win32con.MB_ICONERROR)
             return
 
@@ -644,7 +616,7 @@ class ContextMenuExtension:
         if noargs == False:
             filelist = targets
         cmdopts = "%s" % (verbose and "--verbose" or "")
-        open_dialog(hgcmd, cmdopts, cwd=cwd, root=root, filelist=filelist)
+        open_dialog(gitcmd, cmdopts, cwd=cwd, root=root, filelist=filelist)
 
     def _help(self, parent_window):
         open_dialog('help', '--verbose')

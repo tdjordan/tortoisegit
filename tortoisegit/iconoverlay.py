@@ -7,18 +7,14 @@ import win32api
 import win32con
 from win32com.shell import shell, shellcon
 import _winreg
-from mercurial import hg, cmdutil, util
-from mercurial import repo as _repo
 import thgutil
 import sys
 
 # FIXME: quick workaround traceback caused by missing "closed" 
 # attribute in win32trace.
-from mercurial import ui
 def write_err(self, *args):
     for a in args:
         sys.stderr.write(str(a))
-ui.ui.write_err = write_err
 
 # file/directory status
 UNCHANGED = "unchanged"
@@ -213,12 +209,12 @@ def make_icon_overlay(name, icon_type, state, clsid):
     modified, ...).
     """
     classname = "%sOverlay" % name
-    prog_id = "Mercurial.ShellExtension.%s" % classname
-    desc = "Mercurial icon overlay shell extension for %s files" % name.lower()
+    prog_id = "Git.ShellExtension.%s" % classname
+    desc = "Git icon overlay shell extension for %s files" % name.lower()
     reg = [
             (_winreg.HKEY_LOCAL_MACHINE,
              r"Software\TortoiseOverlays\%s" % icon_type,
-             [("TortoiseHg", clsid)])
+             [("TortoiseGit", clsid)])
         ]
     cls = type(
             classname,

@@ -65,21 +65,8 @@ def DllUnregisterServer():
     register_tortoise_path(unregister=True)
 
 def RegisterServer(cls):
-    # Add mercurial to the library path
-    try:
-        import mercurial
-    except ImportError:
-        from win32com.server import register
-        register.UnregisterClasses(cls)
-        raise "Error: Failed to find mercurial module!"
-
-    git_path = os.path.dirname(os.path.dirname(mercurial.__file__))
-    try:
-        key = "CLSID\\%s\\PythonCOMPath" % cls._reg_clsid_
-        path = _winreg.QueryValue(_winreg.HKEY_CLASSES_ROOT, key)
-        _winreg.SetValue(_winreg.HKEY_CLASSES_ROOT, key, _winreg.REG_SZ, "%s;%s" % (path, git_path))
-    except:
-        pass
+    #import mercurial
+    #git_path = os.path.dirname(os.path.dirname(mercurial.__file__))
         
     # Add the appropriate shell extension registry keys
     for category, keyname, values in cls.registry_keys:
